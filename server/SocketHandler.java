@@ -1,20 +1,21 @@
 package server;
 
 import java.net.Socket;
+import java.io.OutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 // socket处理器
 class SocketHandler implements Runnable {
     private static final int LOGIN_TIMEOUT = 5000; // 登陆超时时间
+    // 客户端->服务端数据包类型常量
     private static final int PACKET_LOGIN = 0;
     private static final int PACKET_GROUP_MSG = 1;
     private static final int PACKET_DM_MSG = 2;
 
     private Socket socket; // socket连接
     private DataInputStream input; // 输入数据流
-    private DataOutputStream output; // 输出数据流
+    private OutputStream output; // 输出数据流
     private volatile boolean isLogined = false; // 是否已经登陆
     private Client client;
 
@@ -26,7 +27,7 @@ class SocketHandler implements Runnable {
     public SocketHandler(Socket socket) throws IOException {
         this.socket = socket;
         input = new DataInputStream(socket.getInputStream());
-        output = new DataOutputStream(socket.getOutputStream());
+        output = socket.getOutputStream();
     }
 
     /** 
@@ -38,9 +39,9 @@ class SocketHandler implements Runnable {
         // 因为还没登陆，输出流只有这里会操作
         // 所以不用同步，直接写入即可
         try { // 发送错误返回包并关闭连接，忽略异常
-            output.writeByte(0); // 错误包类型
+            output.write(0); // 错误包类型
             byte[] bytes = msg.getBytes(); // 错误信息字节
-            output.writeByte(bytes.length); // 错误信息长度
+            output.write(bytes.length); // 错误信息长度
             output.write(bytes); // 错误信息字节
             socket.close(); // 发送完错误信息直接下线
         } catch (Exception e) { }
@@ -69,9 +70,8 @@ class SocketHandler implements Runnable {
         int msgLen = input.readUnsignedShort(); // 消息长度
         byte[] msgBytes = new byte[msgLen];
         input.readFully(msgBytes); // 消息内容字节
-        String msg = new String(msgBytes); // 消息内容字符串
 
-        client.sendGroupMsg(msgType, msg);
+        client.sendGroupMsg(msgType, msgBytes);
     }
 
     /**
@@ -84,9 +84,8 @@ class SocketHandler implements Runnable {
         int msgLen = input.readUnsignedShort(); // 消息长度
         byte[] msgBytes = new byte[msgLen];
         input.readFully(msgBytes); // 消息内容字节
-        String msg = new String(msgBytes); // 消息内容字符串
 
-        client.sendDmMsg(targetId, msgType, msg);
+        client.sendDmMsg(targetId, msgType, msgBytes);
     }
 
     /**
