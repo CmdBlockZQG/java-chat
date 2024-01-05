@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 // 包装一下ByteArrayOutputStream，用来暂存将要发送的数据包
 // 其实可以继承DataOutputStream的，但是用那玩意需要处理根本不存在的异常太难用了
 class PacketBuffer {
-    private ByteArrayOutputStream buf;
+    private final ByteArrayOutputStream buf;
 
     /**
      * 创建数据包缓冲区
@@ -19,7 +19,7 @@ class PacketBuffer {
     /**
      * 将数据包缓冲区的字节输出到out
      * @param out 输出目标流
-     * @throws IOException
+     * @throws IOException 写入目标流异常时抛出
      */
     public void writeTo(OutputStream out) throws IOException {
         buf.writeTo(out);
@@ -42,7 +42,7 @@ class PacketBuffer {
         buf.write((int)(x >>> 24));
         buf.write((int)(x >>> 16));
         buf.write((int)(x >>> 8));
-        buf.write((int)(x >>> 0));
+        buf.write((int)(x));
     }
 
     /**

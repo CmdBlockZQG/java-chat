@@ -16,7 +16,7 @@ class Client {
     private static final int PACKET_DM_MSG = 5;
 
 
-    private static Hashtable<Integer, Client> clients = new Hashtable<Integer, Client>();
+    private static final Hashtable<Integer, Client> clients = new Hashtable<>();
     
     private static final long CONN_CHECK_PERIOD = 60000; // 检查客户端超时的间隔时间
     /**
@@ -48,7 +48,7 @@ class Client {
             synchronized (client.output) {
                 try {
                     buf.writeTo(client.output);
-                } catch (IOException e) { }
+                } catch (IOException ignored) { }
             }
         }
     }
@@ -106,11 +106,10 @@ class Client {
         return buf;
     }
 
-    private DataOutputStream output; // 写入输出数据流时必须使用synchronized块，防止多个线程同时写入造成数据包错误
-    private Socket socket;
-    private int userId = 0;
-    private String userName;
-    private byte[] userNameBytes;
+    private final DataOutputStream output; // 写入输出数据流时必须使用synchronized块，防止多个线程同时写入造成数据包错误
+    private final Socket socket;
+    private final int userId;
+    private final byte[] userNameBytes;
 
     public ConnStatus status; // 接收数据包状态对象，用于检测链接超时
 
@@ -119,13 +118,12 @@ class Client {
      * @param conn 用户Socket对象
      * @param id 用户id
      * @param name 用户名
-     * @throws IOException
+     * @throws IOException Socket异常直接抛出
      */
     public Client(Socket conn, int id, String name) throws IOException {
         socket = conn;
         output = new DataOutputStream(conn.getOutputStream());
         userId = id;
-        userName = name;
         userNameBytes = name.getBytes();
 
         if (clients.containsKey(id)) { // 同帐号重复登陆
@@ -160,9 +158,7 @@ class Client {
                 output.write(bytes); // 错误信息字节
             }
             socket.close();
-        } catch (IOException e) {
-
-        } finally {
+        } catch (IOException ignored) { } finally {
             notifyUserOffline(userId);
         }
         
@@ -205,7 +201,7 @@ class Client {
         synchronized (target.output) {
             try {
                 buf.writeTo(target.output);
-            } catch (IOException e) { }
+            } catch (IOException ignored) { }
         }
     }
 
