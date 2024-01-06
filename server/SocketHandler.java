@@ -12,6 +12,7 @@ class SocketHandler implements Runnable {
     private static final int PACKET_LOGIN = 0; // 登陆包类型
     private static final int PACKET_GROUP_MSG = 1; // 群发消息包类型
     private static final int PACKET_DM_MSG = 2; // 私聊消息包类型
+    private static final int PACKET_CLOSE = 127; // 下线数据包
     private static final int PACKET_TC_MIN = 128; // 临时连接上传包类型
 
     private final Socket socket; // socket连接
@@ -152,11 +153,12 @@ class SocketHandler implements Runnable {
 
         while (true) {
             try {
-                packetType = input.readByte(); // 数据包类型
+                packetType = input.readUnsignedByte(); // 数据包类型
                 client.status.setStatus(true);
                 switch (packetType) {
                     case PACKET_GROUP_MSG: groupMsg(); break;
                     case PACKET_DM_MSG: dmMsg(); break;
+                    case PACKET_CLOSE: client.close(""); break;
                     default: client.close("数据包类型错误"); break;
                 }
                 client.status.setStatus(false);

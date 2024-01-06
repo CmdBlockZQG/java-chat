@@ -9,11 +9,11 @@ import java.net.Socket;
 
 class Client {
     // 服务端->客户端数据包类型常量
-    private static final int PACKET_LOGIN_SUCCESS = 1;
-    private static final int PACKET_USER_ONLINE = 2;
-    private static final int PACKET_USER_OFFLINE = 3;
-    private static final int PACKET_GROUP_MSG = 4;
-    private static final int PACKET_DM_MSG = 5;
+    private static final int PACKET_LOGIN_SUCCESS = 1; // 登陆成功数据包类型
+    private static final int PACKET_USER_ONLINE = 2; // 用户上线数据包类型
+    private static final int PACKET_USER_OFFLINE = 3; // 用户下线数据包类型
+    private static final int PACKET_GROUP_MSG = 4; // 群消息数据包类型
+    private static final int PACKET_DM_MSG = 5; // 私聊消息数据包类型
 
 
     private static final Hashtable<Integer, Client> clients = new Hashtable<>();
@@ -161,7 +161,6 @@ class Client {
         } catch (IOException ignored) { } finally {
             notifyUserOffline(userId);
         }
-        
     }
 
     /**
