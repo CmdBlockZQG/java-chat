@@ -59,16 +59,17 @@ public class TCHandler {
         // 每隔DATA_TIMEOUT检查一次是否接收超时
         timer.schedule(new TimerTask() {
             public void run() {
-                if (System.currentTimeMillis() - lastReceiveTime > DATA_TIMEOUT) {
-                    // 至少在过去的DATA_TIMEOUT时间内没有进行任何数据接收
+            if (System.currentTimeMillis() - lastReceiveTime > DATA_TIMEOUT) {
+                // 至少在过去的DATA_TIMEOUT时间内没有进行任何数据接收
+                try {
+                    endUpload("上传超时");
+                } catch (IOException ignored) {} finally {
                     try {
-                        endUpload("上传超时");
-                    } catch (IOException ignored) {} finally {
-                        try {
-                            socket.close(); // 一旦这里关闭连接，接收文件的循环就会抛出IOException，handleUpload函数会直接退出
-                        } catch (IOException ignored) {}
-                    }
+                        new File("files/tmp-" + id).delete(); // 删除临时文件
+                        socket.close(); // 一旦这里关闭连接，接收文件的循环就会抛出IOException，handleUpload函数会直接退出
+                    } catch (IOException ignored) {}
                 }
+            }
             }
         }, 0, DATA_TIMEOUT);
         return timer;
@@ -80,10 +81,11 @@ public class TCHandler {
      */
     private void handleUpload() throws IOException {
         Timer guard = startGuard();
+        File file = new File("files/tmp-" + id);
 
         int totLen = input.readInt(); // 文件总长度
 
-        try (FileOutputStream f = new FileOutputStream("files/" + id)) {
+        try (FileOutputStream f = new FileOutputStream(file)) {
             byte[] bytes = new byte[1024];
             int curLen;
             // 一旦上传超时，timer会直接关闭socket，这里就会抛出IOException，导致函数直接退出（当然会先执行finally）
@@ -92,7 +94,7 @@ public class TCHandler {
                 // 将输入流的字节直接写入文件
                 f.write(bytes, 0, curLen);
                 totLen -= curLen;
-                if (totLen < 0) break; // 读取的字节数超过约定长度
+                if (totLen <= 0) break; // 上传完成或读取的字节数超过约定长度
             }
         } catch (FileNotFoundException e) {
             endUpload("服务器内部错误");
@@ -102,17 +104,21 @@ public class TCHandler {
             // 最后必须要检查文件是否正确
             if (totLen != 0) { // 中间出了任何问题都会导致接收到的文件尺寸不对
                 // 如果出了问题
-                if (new File("files/" + id).delete()) { // 删除文件
-                    endUpload("文件尺寸错误");
-                } else {
-                    endUpload("服务器内部错误");
-                }
+                file.delete(); // 删除临时文件
+                endUpload("文件上传失败");
             } else { // 文件没出问题
+                File newFile = new File("files/" + id);
+                if (newFile.isFile() && newFile.exists()) newFile.delete(); //删除可能存在的原文件
+                file.renameTo(newFile); // 将临时文件变成正式
                 endUpload(null); // 上传成功
             }
         }
     }
 
+    /**
+     * 处理文件下载
+     * @throws IOException IO异常
+     */
     private void handleDownload() throws IOException {
         PacketBuffer buf = new PacketBuffer();
         buf.write(PACKET_TC_DOWNLOAD); // 写入下载数据包类型
