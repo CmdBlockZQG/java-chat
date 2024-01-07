@@ -111,7 +111,7 @@ class Client {
     private final int userId;
     private final byte[] userNameBytes;
 
-    public ConnStatus status; // 接收数据包状态对象，用于检测链接超时
+    public final ConnStatus status; // 接收数据包状态对象，用于检测链接超时
 
     /**
      * 用户登陆
@@ -126,11 +126,13 @@ class Client {
         userId = id;
         userNameBytes = name.getBytes();
 
+        status = new ConnStatus();
+
         if (clients.containsKey(id)) { // 同帐号重复登陆
             clients.get(id).close("id在另一个客户端登陆"); // 把前一个用户踢下线
         }
         notifyUserOnline(id, userNameBytes); // 通知所有在线用户
-        clients.put(id, this);
+        clients.put(id, this); // 将新用户加入列表
         // 发送登陆成功数据包
         synchronized (output) {
             // 数据包类型

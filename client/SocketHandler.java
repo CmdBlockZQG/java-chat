@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 // 处理服务器socket连接，接收来自服务器的数据包
-public class SocketHandler extends Thread {
+class SocketHandler extends Thread {
     private static final int PACKET_FAILURE = 0; // 错误数据包类型
     private static final int PACKET_LOGIN_SUCCESS = 1; // 登陆成功数据包类型
     private static final int PACKET_USER_ONLINE = 2; // 用户上线数据包类型

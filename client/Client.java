@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 // Socket客户端
-class Client {
+public class Client {
     private static final String host = "127.0.0.1"; // 服务器地址
     private static final int port = 1145; // 端口号
 
@@ -25,13 +25,21 @@ class Client {
      * @param name 用户名
      * @throws IOException IO异常
      */
-    public Client(int id, String name, EventListener listener) throws IOException {
+    public Client(int id, String name) throws IOException {
         userId = id;
         userName = name;
-        socket = new Socket(host, port);
-        output = socket.getOutputStream();
+        socket = new Socket(host, port); // socket连接对象
+        output = socket.getOutputStream(); // 输出流
 
         login(); // 登陆
+    }
+
+    /**
+     * 注册事件处理器，并开始接收服务器消息
+     * @param listener 事件侦听器
+     * @throws IOException IO异常
+     */
+    public void registerListener(EventListener listener) throws IOException {
         new SocketHandler(socket, listener).start(); // 开始监听服务器消息并产生事件
     }
 
