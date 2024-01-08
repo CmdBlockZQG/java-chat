@@ -1,12 +1,14 @@
 package ui;
 
 import client.Client;
+import client.User;
 
 import java.io.IOException;
 
 // ui客户端入口类
 public class Main {
     private static LoginFrame loginFrame;
+    static MainFrame mainFrame;
     public static Client client = null;
 
     /**
@@ -35,6 +37,7 @@ public class Main {
         try {
             // 登陆并注册事件监听器
             client = new Client(id, name);
+            mainFrame = new MainFrame(new User(id, name)); // 先预载主窗口
             client.registerListener(new EventHandler(client));
         } catch (IOException e) {
             new MessageDialog("网络错误，登陆失败！", () -> System.exit(0));
@@ -42,6 +45,6 @@ public class Main {
         // 销毁登陆窗口
         loginFrame.dispose();
         // 打开主窗口
-        new MainFrame();
+        mainFrame.open();
     }
 }

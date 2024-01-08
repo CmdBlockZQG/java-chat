@@ -7,14 +7,14 @@ public class LoginFrame extends JFrame {
     private JTextField idField; // 用户id输入框
     private JTextField nameField; // 用户名输入框
     private JButton loginButton; // 登陆按钮
-    private JPanel panel;
+    private JPanel contentPane;
 
     /**
      * 构造并显示登陆窗口
      */
     public LoginFrame() {
         super("登陆"); // 窗口标题
-        setContentPane(panel);
+        setContentPane(contentPane);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         loginButton.addActionListener(actionEvent -> {
@@ -31,6 +31,7 @@ public class LoginFrame extends JFrame {
         });
 
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 }

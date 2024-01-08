@@ -1,8 +1,6 @@
 package ui;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 // 信息提示框
 public class MessageDialog extends JDialog {
@@ -17,6 +15,7 @@ public class MessageDialog extends JDialog {
      */
     public MessageDialog(String msg, Runnable onOk) {
         setContentPane(contentPane);
+        setLocationRelativeTo(null);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         msgLabel.setText(msg);

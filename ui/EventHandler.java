@@ -29,10 +29,7 @@ class EventHandler implements EventListener {
      * @param users 用户列表
      */
     public void userList(User[] users) {
-        System.out.println("登陆成功");
-        for (User user : users) {
-            System.out.println(user);
-        }
+        Main.mainFrame.setUserList(users);
     }
 
     /**
@@ -40,7 +37,7 @@ class EventHandler implements EventListener {
      * @param user 用户对象
      */
     public void userOnline(User user) {
-
+        Main.mainFrame.userOnline(user);
     }
 
     /**
@@ -48,7 +45,7 @@ class EventHandler implements EventListener {
      * @param userId 用户id
      */
     public void userOffline(int userId) {
-
+        Main.mainFrame.userOffline(userId);
     }
 
     /**
@@ -70,6 +67,6 @@ class EventHandler implements EventListener {
      * @param msg 消息内容
      */
     public void dmMsg(int userId, long time, int msgType, String msg) {
-
+        // TODO: 写入聊天记录文件，如果私聊窗口已经打开，则发送给目标窗口
     }
 }
