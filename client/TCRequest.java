@@ -16,8 +16,8 @@ public class TCRequest {
     /**
      * 文件上传
      * @param filename 欲上传的文件名
-     * @return 上传失败返回错误信息，成功返回null
-     * @throws IOException IO异常
+     * @return 文件md5
+     * @throws IOException 上传失败
      */
     public static String upload(String filename) throws IOException {
         File file = new File(filename); // 打开文件
@@ -43,7 +43,6 @@ public class TCRequest {
         OutputStream output = conn.getOutputStream();
         PacketBuffer buf = new PacketBuffer();
         buf.write(PACKET_TC_UPLOAD); // 上传包类型
-        for (int i = 0; i < 32 - md5.length; ++i) buf.write(0); // 不足32字节补充前导0
         buf.writeBytes(md5); // md5值
         buf.writeUint32(totLen); // 文件总长度
         buf.writeTo(output);
@@ -54,19 +53,20 @@ public class TCRequest {
         // output.close();
 
         // 打开输入流接收服务器返回
-        String res = null; // 返回结果
+        String md5Str = new String(md5); // 返回md5值
+        // 打开输入流，读取服务器返回的信息
         DataInputStream input = new DataInputStream(conn.getInputStream());
         input.skipBytes(1); // 跳过返回包类型
         int msgLen = input.readUnsignedByte(); // 错误信息长度
-        if (msgLen != 0) { // 上传成功
+        if (msgLen != 0) { // 上传失败
             byte[] msgBytes = new byte[msgLen];
             input.readFully(msgBytes);
-            res = new String(msgBytes);
+            conn.close();
+            throw new IOException(new String(msgBytes));
         }
-
         // 关闭连接返回结果
         conn.close();
-        return res;
+        return md5Str;
     }
 
     /**
@@ -85,15 +85,14 @@ public class TCRequest {
      * 文件下载
      * @param id 欲下载的文件id
      * @param filename 保存位置
-     * @return 下载失败返回错误信息，成功返回null
-     * @throws IOException IO异常
+     * @throws IOException 下载失败
      */
-    public static String download(String id, String filename) throws IOException {
+    public static void download(String id, String filename) throws IOException {
         Socket conn = new Socket(host, port); // 打开socket连接
         PacketBuffer buf = new PacketBuffer();
         buf.write(PACKET_TC_DOWNLOAD); // 发送下载包类型
         byte[] md5Bytes = id.getBytes();
-        if (md5Bytes.length != 32) return "文件id错误";
+        if (md5Bytes.length != 32) throw new IOException("文件id错误");
         buf.writeBytes(id.getBytes()); // 文件id
         buf.writeTo(conn.getOutputStream());
 
@@ -106,8 +105,8 @@ public class TCRequest {
             byte[] msgBytes = new byte[msgLen];
             input.readFully(msgBytes);
             conn.close(); // 关闭socket
-            // 返回错误信息
-            return new String(msgBytes);
+            // 抛出错误信息
+            throw new IOException(new String(msgBytes));
         }
 
         // 打开目标文件输出流
@@ -123,15 +122,14 @@ public class TCRequest {
             totLen -= curLen;
             if (totLen == 0) break;
         }
-        // 关闭文件及socket连接
+        // 成功接收文件，关闭文件及socket连接
         output.close();
         conn.close();
-        return null; // 成功接收文件
     }
 
     // 测试用主函数
     public static void main(String[] args) throws IOException {
         System.out.println(upload("client/Client.java"));
-        System.out.println(download("c08430fbed443cb7a52059ba4f7ae381", "haha"));
+        // System.out.println(download("c08430fbed443cb7a52059ba4f7ae381", "haha"));
     }
 }

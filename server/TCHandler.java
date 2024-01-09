@@ -81,6 +81,9 @@ public class TCHandler {
      */
     private void handleUpload() throws IOException {
         Timer guard = startGuard();
+        // 创建文件保存目录
+        File folder = new File("files");
+        if (!folder.exists() || !folder.isDirectory()) folder.mkdir();
         File file = new File("files/tmp-" + id);
 
         int totLen = input.readInt(); // 文件总长度

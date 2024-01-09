@@ -1,20 +1,15 @@
 package ui;
 
-import client.Client;
 import client.EventListener;
 import client.User;
 
 // 服务器事件处理器
 class EventHandler implements EventListener {
-    private final Client client;
 
     /**
      * 构造事件处理器
-     * @param client 客户端对象
      */
-    public EventHandler(Client client) {
-        this.client = client;
-    }
+    public EventHandler() {}
 
     /**
      * 服务器返回错误，断开连接
@@ -29,7 +24,12 @@ class EventHandler implements EventListener {
      * @param users 用户列表
      */
     public void userList(User[] users) {
-        Main.mainFrame.setUserList(users);
+        // 写入用户会话列表
+        for (User user : users) {
+            Main.userSessions.put(user.id, new UserSession(user));
+        }
+        // 更新主窗口ui列表
+        Main.mainFrame.updateUserSessionList();
     }
 
     /**
@@ -37,7 +37,10 @@ class EventHandler implements EventListener {
      * @param user 用户对象
      */
     public void userOnline(User user) {
-        Main.mainFrame.userOnline(user);
+        // 更新用户会话列表
+        Main.userSessions.put(user.id, new UserSession(user));
+        // 更新主窗口ui列表
+        Main.mainFrame.updateUserSessionList();
     }
 
     /**
@@ -45,7 +48,10 @@ class EventHandler implements EventListener {
      * @param userId 用户id
      */
     public void userOffline(int userId) {
-        Main.mainFrame.userOffline(userId);
+        // 更新用户会话列表
+        Main.userSessions.remove(userId);
+        // 更新主窗口ui列表
+        Main.mainFrame.updateUserSessionList();
     }
 
     /**
@@ -56,7 +62,7 @@ class EventHandler implements EventListener {
      * @param msg 消息内容
      */
     public void groupMsg(int userId, long time, int msgType, String msg) {
-
+        Main.groupPanel.displayMsg(Main.userSessions.get(userId).user, time, msgType, msg); // 在主窗口展示消息
     }
 
     /**
@@ -67,6 +73,12 @@ class EventHandler implements EventListener {
      * @param msg 消息内容
      */
     public void dmMsg(int userId, long time, int msgType, String msg) {
-        // TODO: 写入聊天记录文件，如果私聊窗口已经打开，则发送给目标窗口
+        if (Main.chatPanels.containsKey(userId)) { // 私聊窗口已经打开
+            // 在私聊窗口展示消息
+            Main.chatPanels.get(userId).displayMsg(Main.userSessions.get(userId).user, time, msgType, msg);
+        } else {
+            Main.userSessions.get(userId).msgCnt++; // 未读消息+1
+            Main.mainFrame.updateUserSessionList(); // 更新主窗口列表
+        }
     }
 }
