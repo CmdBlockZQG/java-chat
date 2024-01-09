@@ -7,9 +7,11 @@ import java.io.IOException;
 
 // ui客户端入口类
 public class Main {
-    private static LoginFrame loginFrame;
-    static MainFrame mainFrame;
-    public static Client client = null;
+    private static LoginFrame loginFrame; // 登陆窗口对象
+    static MainFrame mainFrame; // 主窗口对象
+    static Client client = null; // 客户端对象
+    static int userId; // 用户id
+    static String userName; // 用户名
 
     /**
      * 客户端ui运行入口
@@ -34,10 +36,12 @@ public class Main {
      * @param name 用户名
      */
     public static void login(int id, String name) {
+        userId = id;
+        userName = name;
         try {
             // 登陆并注册事件监听器
             client = new Client(id, name);
-            mainFrame = new MainFrame(new User(id, name)); // 先预载主窗口
+            mainFrame = new MainFrame(); // 先预载主窗口
             client.registerListener(new EventHandler(client));
         } catch (IOException e) {
             new MessageDialog("网络错误，登陆失败！", () -> System.exit(0));

@@ -7,7 +7,7 @@ public class LoginFrame extends JFrame {
     private JTextField idField; // 用户id输入框
     private JTextField nameField; // 用户名输入框
     private JButton loginButton; // 登陆按钮
-    private JPanel contentPane;
+    private JPanel contentPane; // 主容器
 
     /**
      * 构造并显示登陆窗口
@@ -30,6 +30,7 @@ public class LoginFrame extends JFrame {
             Main.login(id, nameField.getText());
         });
 
+        // 调整窗口大小和位置，并显示窗口
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
