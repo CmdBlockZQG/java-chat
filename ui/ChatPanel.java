@@ -39,6 +39,7 @@ public class ChatPanel {
 
     final JFrame parent; // 所在的窗口
     private final int target; // 私聊对象的用户id，TARGET_GROUP表示群聊
+    final MsgRecord record; // 消息记录文件
 
     /**
      * 构造聊天面板
@@ -50,6 +51,17 @@ public class ChatPanel {
         // 设置消息框为html格式，不可编辑
         msgPane.setContentType("text/html");
         msgPane.setEditable(false);
+
+        // 加载消息记录
+        if (target == TARGET_GROUP) {
+            record = Main.groupRecord; // 群聊消息记录对象是常驻的
+        } else {
+            record = new MsgRecord(target); // 加载私聊消息记录对象
+        }
+        MsgRecord.Entry[] msgList = record.readAll(); // 读取全部消息记录
+        for (MsgRecord.Entry msg : msgList) { // 添加进消息框
+            displayMsg(msg.userId, msg.userName, msg.time, msg.msgType, msg.msg);
+        }
 
         // 点击聊天框中的链接事件处理
         msgPane.addHyperlinkListener(e -> {
@@ -145,8 +157,10 @@ public class ChatPanel {
         } else { // 发送私聊消息
             try {
                 Main.client.sendDmMsg(target, msgType, msg);
-                if (target != Main.userId) { // 如果不是发送给自己的消息，则自己发送的消息需要单独显示
-                    displayMsg(new User(Main.userId, Main.userName), System.currentTimeMillis() / 1000, msgType, msg);
+                if (target != Main.userId) { // 如果不是发送给自己的消息，则自己发送的消息需要处理
+                    long time = System.currentTimeMillis() / 1000;
+                    displayMsg(Main.user, time, msgType, msg); // 展示消息
+                    record.append(Main.user, time, msgType, msg); // 存储到消息记录
                 }
             } catch (IOException ignored) {}
         }
@@ -169,15 +183,14 @@ public class ChatPanel {
 
     /**
      * 在聊天框中展示新消息
-     * @param user 发送者对象
+     * @param userId 发送者id
+     * @param userName 发送者用户名
      * @param time 发送时间时间戳（s）
      * @param msgType 消息类型
      * @param msg 消息内容字符串
      */
-    public void displayMsg(User user, long time, int msgType, String msg) {
-        int userId = user.id;
-        String userName = user.name;
-        String color = user.id == Main.userId ? "green" : "blue";
+    public void displayMsg(int userId, String userName, long time, int msgType, String msg) {
+        String color = userId == Main.userId ? "green" : "blue";
 
         if (msgType == MSG_PIC) { // 图片消息需要先下载图
             try {
@@ -218,5 +231,16 @@ public class ChatPanel {
         };
         appendTag.accept(content); // 加入刚才生成的html tag
         scrollToBottom(); // 滚动到聊天框底部
+    }
+
+    /**
+     * 在聊天框中展示新消息
+     * @param user 发送者对象
+     * @param time 发送时间时间戳（s）
+     * @param msgType 消息类型
+     * @param msg 消息内容字符串
+     */
+    public void displayMsg(User user, long time, int msgType, String msg) {
+        displayMsg(user.id, user.name, time, msgType, msg);
     }
 }

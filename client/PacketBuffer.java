@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 
 // 包装一下ByteArrayOutputStream，用来暂存将要发送的数据包
 // 其实可以继承DataOutputStream的，但是用那玩意需要处理根本不存在的异常太难用了
-class PacketBuffer {
+public class PacketBuffer {
     private final ByteArrayOutputStream buf;
 
     /**

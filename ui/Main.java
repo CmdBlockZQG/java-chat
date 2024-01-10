@@ -1,6 +1,7 @@
 package ui;
 
 import client.Client;
+import client.User;
 
 import java.io.IOException;
 import java.util.Hashtable;
@@ -10,14 +11,15 @@ public class Main {
     static Client client = null; // 客户端对象
     static int userId; // 用户id
     static String userName; // 用户名
+    static User user; // 用户对象
 
     // 在线用户会话，key为用户id
     static final Hashtable<Integer, UserSession> userSessions = new Hashtable<>();
-
     // 用户会话面板，key为用户id
     static final Hashtable<Integer, ChatPanel> chatPanels = new Hashtable<>();
 
     static ChatPanel groupPanel; // 群聊面板
+    static MsgRecord groupRecord; // 群聊消息记录文件
     private static LoginFrame loginFrame; // 登陆窗口对象
     static MainFrame mainFrame; // 主窗口对象
 
@@ -32,6 +34,8 @@ public class Main {
             try {
                 // 关闭客户端
                 client.close();
+                // 关闭消息记录文件
+                groupRecord.close();
             } catch (IOException ignored) {}
         }));
         // 显示登陆窗口
@@ -46,9 +50,11 @@ public class Main {
     public static void login(int id, String name) {
         userId = id;
         userName = name;
+        user = new User(id, name);
         try {
             // 登陆并注册事件监听器
             client = new Client(id, name);
+            groupRecord = new MsgRecord(ChatPanel.TARGET_GROUP); // 打开消息记录文件接口
             mainFrame = new MainFrame(); // 预载主窗口
             client.registerListener(new EventHandler());
         } catch (IOException e) {

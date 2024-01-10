@@ -5,12 +5,6 @@ import client.User;
 
 // 服务器事件处理器
 class EventHandler implements EventListener {
-
-    /**
-     * 构造事件处理器
-     */
-    public EventHandler() {}
-
     /**
      * 服务器返回错误，断开连接
      * @param msg 错误信息
@@ -62,7 +56,9 @@ class EventHandler implements EventListener {
      * @param msg 消息内容
      */
     public void groupMsg(int userId, long time, int msgType, String msg) {
-        Main.groupPanel.displayMsg(Main.userSessions.get(userId).user, time, msgType, msg); // 在主窗口展示消息
+        User user = Main.userSessions.get(userId).user;
+        Main.groupPanel.displayMsg(user, time, msgType, msg); // 在主窗口展示消息
+        Main.groupRecord.append(user ,time, msgType, msg); // 写入消息记录
     }
 
     /**
@@ -73,12 +69,18 @@ class EventHandler implements EventListener {
      * @param msg 消息内容
      */
     public void dmMsg(int userId, long time, int msgType, String msg) {
+        User user = Main.userSessions.get(userId).user;
         if (Main.chatPanels.containsKey(userId)) { // 私聊窗口已经打开
+            ChatPanel chatPanel = Main.chatPanels.get(userId);
             // 在私聊窗口展示消息
-            Main.chatPanels.get(userId).displayMsg(Main.userSessions.get(userId).user, time, msgType, msg);
+            chatPanel.displayMsg(user, time, msgType, msg);
+            // 写入消息记录文件
+            chatPanel.record.append(user, time, msgType, msg);
         } else {
             Main.userSessions.get(userId).msgCnt++; // 未读消息+1
             Main.mainFrame.updateUserSessionList(); // 更新主窗口列表
+            // 写入消息记录文件
+            MsgRecord.appendEntry(userId, new MsgRecord.Entry(user, time, msgType, msg));
         }
     }
 }

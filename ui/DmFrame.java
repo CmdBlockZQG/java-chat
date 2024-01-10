@@ -26,6 +26,7 @@ public class DmFrame extends JFrame {
 
         addWindowListener(new WindowAdapter() { // 当关闭私聊窗口时
             public void windowClosing(WindowEvent e) {
+                chatPanel.record.close(); // 关闭面板的消息记录文件
                 Main.chatPanels.remove(target); // 移除面板（会导致重新开始统计未读消息数目）
             }
         });
