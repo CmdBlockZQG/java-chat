@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import common.Config;
+import common.PacketBuffer;
+
 // Socket客户端
 public class Client {
-    private static final String host = "127.0.0.1"; // 服务器地址
-    private static final int port = 1145; // 端口号
-
     private static final int PACKET_LOGIN = 0; // 登陆包类型
     private static final int PACKET_GROUP_MSG = 1; // 群发消息包类型
     private static final int PACKET_DM_MSG = 2; // 私聊消息包类型
@@ -28,7 +28,7 @@ public class Client {
     public Client(int id, String name) throws IOException {
         userId = id;
         userName = name;
-        socket = new Socket(host, port); // socket连接对象
+        socket = new Socket(Config.HOST, Config.PORT); // socket连接对象
         output = socket.getOutputStream(); // 输出流
 
         login(); // 登陆

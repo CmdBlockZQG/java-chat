@@ -1,5 +1,7 @@
 package server;
 
+import common.PacketBuffer;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Hashtable;
@@ -48,7 +50,7 @@ class Client {
             synchronized (client.output) {
                 try {
                     buf.writeTo(client.output);
-                } catch (IOException ignored) { }
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -160,7 +162,7 @@ class Client {
                 output.write(bytes); // 错误信息字节
             }
             socket.close();
-        } catch (IOException ignored) { } finally {
+        } catch (IOException ignored) {} finally {
             notifyUserOffline(userId);
         }
     }
@@ -202,7 +204,7 @@ class Client {
         synchronized (target.output) {
             try {
                 buf.writeTo(target.output);
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {}
         }
     }
 

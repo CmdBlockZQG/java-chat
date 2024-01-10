@@ -150,6 +150,7 @@ class SocketHandler implements Runnable {
         }
 
         isLogin = true;
+        guard.interrupt(); // guard可以下班了
 
         while (true) {
             try {

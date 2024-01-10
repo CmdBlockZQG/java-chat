@@ -22,6 +22,7 @@ public class DmFrame extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
 
         addWindowListener(new WindowAdapter() { // 当关闭私聊窗口时

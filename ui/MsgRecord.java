@@ -1,6 +1,6 @@
 package ui;
 
-import client.PacketBuffer;
+import common.PacketBuffer;
 import client.User;
 
 import java.io.*;

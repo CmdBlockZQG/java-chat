@@ -1,5 +1,7 @@
 package client;
 
+import common.PacketBuffer;
+
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
