@@ -22,6 +22,7 @@ public class ChatPanel {
 
     /**
      * 工具函数：将时间戳转换为字符串
+     *
      * @param timeStamp 时间戳（s）
      * @return 结果字符串
      */
@@ -78,16 +79,19 @@ public class ChatPanel {
                 String dir = fileDialog.getDirectory();
                 file = fileDialog.getFile();
                 if (dir == null || file == null) { // 路径有问题
-                    new MessageDialog("请选择正确的保存位置！", () -> {});
+                    new MessageDialog("请选择正确的保存位置！", () -> {
+                    });
                     return;
                 }
                 try {
                     TCRequest.download(md5, dir + file); // 从服务端下载文件
                 } catch (IOException err) {
-                    new MessageDialog("文件下载失败：" + err, () -> {});
+                    new MessageDialog("文件下载失败：" + err, () -> {
+                    });
                     return;
                 }
-                new MessageDialog("文件下载完成", () -> {});
+                new MessageDialog("文件下载完成", () -> {
+                });
             }
         });
 
@@ -107,14 +111,16 @@ public class ChatPanel {
             String dir = fileDialog.getDirectory();
             String file = fileDialog.getFile();
             if (dir == null || file == null) { // 路径有问题
-                new MessageDialog("请选择正确的图片文件！", () -> {});
+                new MessageDialog("请选择正确的图片文件！", () -> {
+                });
                 return;
             }
             String md5;
             try {
                 md5 = TCRequest.upload(dir + file); // 上传图片并获取图片id
             } catch (IOException err) {
-                new MessageDialog("上传失败：" + err, () -> {});
+                new MessageDialog("上传失败：" + err, () -> {
+                });
                 return;
             }
             sendMsg(MSG_PIC, md5); // 发送图片消息
@@ -129,14 +135,16 @@ public class ChatPanel {
             String dir = fileDialog.getDirectory();
             String file = fileDialog.getFile();
             if (dir == null || file == null) { // 路径有问题
-                new MessageDialog("请选择正确的文件！", () -> {});
+                new MessageDialog("请选择正确的文件！", () -> {
+                });
                 return;
             }
             String md5;
             try {
                 md5 = TCRequest.upload(dir + file); // 上传文件并获取文件id
             } catch (IOException err) {
-                new MessageDialog("上传失败：" + err, () -> {});
+                new MessageDialog("上传失败：" + err, () -> {
+                });
                 return;
             }
             sendMsg(MSG_FILE, md5 + file); // 发送文件消息
@@ -145,15 +153,17 @@ public class ChatPanel {
 
     /**
      * 发送消息
+     *
      * @param msgType 消息类型
-     * @param msg 消息内容
+     * @param msg     消息内容
      */
     private void sendMsg(int msgType, String msg) {
         if (msg.isEmpty()) return; // 忽略空消息
         if (target == TARGET_GROUP) { // 发送群消息
             try {
                 Main.client.sendGroupMsg(msgType, msg);
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         } else { // 发送私聊消息
             try {
                 Main.client.sendDmMsg(target, msgType, msg);
@@ -162,12 +172,14 @@ public class ChatPanel {
                     displayMsg(Main.user, time, msgType, msg); // 展示消息
                     record.append(Main.user, time, msgType, msg); // 存储到消息记录
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 
     /**
      * 获取面板容器对象
+     *
      * @return 面板容器对象
      */
     public JPanel getPanel() {
@@ -183,11 +195,12 @@ public class ChatPanel {
 
     /**
      * 在聊天框中展示新消息
-     * @param userId 发送者id
+     *
+     * @param userId   发送者id
      * @param userName 发送者用户名
-     * @param time 发送时间时间戳（s）
-     * @param msgType 消息类型
-     * @param msg 消息内容字符串
+     * @param time     发送时间时间戳（s）
+     * @param msgType  消息类型
+     * @param msg      消息内容字符串
      */
     public void displayMsg(int userId, String userName, long time, int msgType, String msg) {
         String color = userId == Main.userId ? "green" : "blue";
@@ -207,12 +220,13 @@ public class ChatPanel {
         }
 
         // 向TextPane中加入html标签
-        HTMLDocument doc = (HTMLDocument)msgPane.getStyledDocument();
+        HTMLDocument doc = (HTMLDocument) msgPane.getStyledDocument();
         Consumer<String> appendTag = (html) -> {
             try {
                 doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), html);
                 doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), "<br>");
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         };
 
         // 消息头部，展示发送者和发送时间
@@ -235,12 +249,59 @@ public class ChatPanel {
 
     /**
      * 在聊天框中展示新消息
-     * @param user 发送者对象
-     * @param time 发送时间时间戳（s）
+     *
+     * @param user    发送者对象
+     * @param time    发送时间时间戳（s）
      * @param msgType 消息类型
-     * @param msg 消息内容字符串
+     * @param msg     消息内容字符串
      */
     public void displayMsg(User user, long time, int msgType, String msg) {
         displayMsg(user.id, user.name, time, msgType, msg);
+    }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        contentPane = new JPanel();
+        contentPane.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(4, 1, new Insets(0, 0, 0, 0), -1, -1));
+        final JScrollPane scrollPane1 = new JScrollPane();
+        contentPane.add(scrollPane1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(400, 300), null, 0, false));
+        msgPane = new JTextPane();
+        scrollPane1.setViewportView(msgPane);
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        contentPane.add(panel1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        picBth = new JButton();
+        picBth.setText("图片");
+        panel1.add(picBth);
+        fileBtn = new JButton();
+        fileBtn.setText("文件");
+        panel1.add(fileBtn);
+        final JScrollPane scrollPane2 = new JScrollPane();
+        contentPane.add(scrollPane2, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(400, 100), null, 0, false));
+        msgArea = new JTextArea();
+        scrollPane2.setViewportView(msgArea);
+        sendBtn = new JButton();
+        sendBtn.setText("发送");
+        contentPane.add(sendBtn, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return contentPane;
     }
 }
